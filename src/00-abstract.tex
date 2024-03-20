@@ -1,0 +1,18 @@
+\begin{abstract}
+    % the background
+    % CARLA is a well-established open-source simulator for high-fidelity emulation of self-driving systems, which has been widely used for the development and validation of machine learning models on autonomous driving.
+    In this paper, an optimization framework integrated with high-fidelity traffic simulator CARLA, namely {\fwName}, is proposed for the scheduling of model uploading in a vehicle-to-infrastructure (V2I) network.
+    Specifically, a group of {\IAVFullnames} ({\IAVs}) are moving along their planned routes with random velocities to collect sensing data and train a model via federated learning, where the uplink model transmission of multiple {\IAVs} in one learning iteration is jointly optimized.
+    % the platform
+    We first develop the {\fwName} simulator from CARLA, to obtain high-fidelity trajectory dataset of {\IAVs} in the considered traffic scenario, and train the transition probabilities of the {\IAVs}' locations.
+    % the problem
+    Hence, the uplink transmission time and power of all {\IAVs} in all the time slots can be formulated as a finite-horizon Markov decision process (MDP), where the prediction of {\IAVs}' future locations is exploited to minimize a weighted sum of average model uploading time and average energy consumption.
+    Since the optimal solution of the problem suffers from the curse of dimensionality, a low-complexity {\fwName} optimizer with a non-trivial performance bound is proposed, where the optimization is decomposed into periodic global transmission time allocation and local power allocation. The former is a deterministic optimization problem and the latter is a finite-horizon MDP with tolerable state space.
+    The simulation results show that the proposed solution framework can achieve both a significant performance gain over the baselines and a flexible trade-off between performance and complexity.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    Federated edge learning (FEEL),
+    CARLA,
+    Approximate MDP.
+\end{IEEEkeywords}

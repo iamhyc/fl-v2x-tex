@@ -1,0 +1,230 @@
+% \documentclass[journal, 12pt, onecolumn, draftclsnofoot]{IEEEtran} %journal draft
+\documentclass[conference]{IEEEtran} %conference draft
+
+\usepackage[linesnumbered,vlined,ruled]{algorithm2e}
+\usepackage{algorithmic}
+\usepackage{etoolbox}
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs non-compress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+\else
+  % normal IEEE
+  \usepackage{cite}
+\fi
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{mathtools}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{dcolumn}
+\usepackage[utf8]{inputenc}
+\usepackage{soul}
+\usepackage{array}
+\usepackage{tabulary}
+\usepackage{bbm}
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+%---------------------------------------------------------------%
+%% the pretty \widebar symbol: 
+\makeatletter
+\let\save@mathaccent\mathaccent
+\newcommand*\if@single[3]{%
+  \setbox0\hbox{${\mathaccent"0362{#1}}^H$}%
+  \setbox2\hbox{${\mathaccent"0362{\kern0pt#1}}^H$}%
+  \ifdim\ht0=\ht2 #3\else #2\fi
+  }
+%The bar will be moved to the right by a half of \macc@kerna, which is computed by amsmath:
+\newcommand*\rel@kern[1]{\kern#1\dimexpr\macc@kerna}
+%If there's a superscript following the bar, then no negative kern may follow the bar;
+%an additional {} makes sure that the superscript is high enough in this case:
+\newcommand*\widebar[1]{\@ifnextchar^{{\wide@bar{#1}{0}}}{\wide@bar{#1}{1}}}
+%Use a separate algorithm for single symbols:
+\newcommand*\wide@bar[2]{\if@single{#1}{\wide@bar@{#1}{#2}{1}}{\wide@bar@{#1}{#2}{2}}}
+\newcommand*\wide@bar@[3]{%
+  \begingroup
+  \def\mathaccent##1##2{%
+%Enable nesting of accents:
+    \let\mathaccent\save@mathaccent
+%If there's more than a single symbol, use the first character instead (see below):
+    \if#32 \let\macc@nucleus\first@char \fi
+%Determine the italic correction:
+    \setbox\z@\hbox{$\macc@style{\macc@nucleus}_{}$}%
+    \setbox\tw@\hbox{$\macc@style{\macc@nucleus}{}_{}$}%
+    \dimen@\wd\tw@
+    \advance\dimen@-\wd\z@
+%Now \dimen@ is the italic correction of the symbol.
+    \divide\dimen@ 3
+    \@tempdima\wd\tw@
+    \advance\@tempdima-\scriptspace
+%Now \@tempdima is the width of the symbol.
+    \divide\@tempdima 10
+    \advance\dimen@-\@tempdima
+%Now \dimen@ = (italic correction / 3) - (Breite / 10)
+    \ifdim\dimen@>\z@ \dimen@0pt\fi
+%The bar will be shortened in the case \dimen@<0 !
+    \rel@kern{0.6}\kern-\dimen@
+    \if#31
+      \overline{\rel@kern{-0.6}\kern\dimen@\macc@nucleus\rel@kern{0.4}\kern\dimen@}%
+      \advance\dimen@0.4\dimexpr\macc@kerna
+%Place the combined final kern (-\dimen@) if it is >0 or if a superscript follows:
+      \let\final@kern#2%
+      \ifdim\dimen@<\z@ \let\final@kern1\fi
+      \if\final@kern1 \kern-\dimen@\fi
+    \else
+      \overline{\rel@kern{-0.6}\kern\dimen@#1}%
+    \fi
+  }%
+  \macc@depth\@ne
+  \let\math@bgroup\@empty \let\math@egroup\macc@set@skewchar
+  \mathsurround\z@ \frozen@everymath{\mathgroup\macc@group\relax}%
+  \macc@set@skewchar\relax
+  \let\mathaccentV\macc@nested@a
+%The following initialises \macc@kerna and calls \mathaccent:
+  \if#31
+    \macc@nested@a\relax111{#1}%
+  \else
+%If the argument consists of more than one symbol, and if the first token is
+%a letter, use that letter for the computations:
+    \def\gobble@till@marker##1\endmarker{}%
+    \futurelet\first@char\gobble@till@marker#1\endmarker
+    \ifcat\noexpand\first@char A\else
+      \def\first@char{}%
+    \fi
+    \macc@nested@a\relax111{\first@char}%
+  \fi
+  \endgroup
+}
+\makeatother
+%---------------------------------------------------------------%
+\newtheorem{definition}{Definition}   % 
+\theoremstyle{definition}             % alter theorem style: <definition>
+\newtheorem{program}{Program}         % [program]
+\newtheorem{assumption}{Assumption}   % [assumption]
+\newtheorem{example}{Example}         % [example]
+\newtheorem{Algorithm}{Algorithm}     % [algorithm]
+\newtheorem{policy}{Policy}           % [policy]
+\newtheorem{problem}{Problem}         % [problem]
+\theoremstyle{remark}                 % alter theorem style: <remark>
+\newtheorem{remark}{Remark}           % [remark]
+\theoremstyle{plain}                  % alter theorem style: <plain>
+\newtheorem{theorem}{Theorem}         % [theorem]
+\newtheorem{lemma}{Lemma}             % [lemma]
+\newtheorem{corollary}{Corollary}     % [corollary]
+%---------------------------------------------------------------%
+\newcommand{\slide}[1]{{\mathbf{#1}}} %\overset{\rightarrow}
+\newcommand{\eq}{=}
+\newcommand{\domR}{\mathbb{R}}
+\newcommand{\domZ}{\mathbb{Z}_{*}}
+\newcommand{\domP}{\mathbb{Z}_{*}}
+\newcommand{\vecOne}{\mathbf{1}}
+\newcommand{\indicator}{\mathbbm{1}}
+\newcommand{\mat}{\mathbf}
+\newcommand{\Poisson}{\text{Poisson}}
+\newcommand{\Bernoulli}{\text{Bernoulli}}
+\newcommand{\define}{\triangleq}
+\newcommand{\leadto}{\Rightarrow}
+\newcommand{\vecG}{\boldsymbol}
+\renewcommand{\vec}{\mathbf}
+\newcommand{\Baseline}{\mathbf{\Pi}}
+\newcommand{\T}{{T_{\max}}}
+\newcommand{\C}{\mathcal{C}}
+\renewcommand{\d}{\mathpzc{d}}
+\renewcommand{\u}{\mathpzc{u}}
+\renewcommand{\L}{\mathcal{L}}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\norm}{|}{|}
+\DeclarePairedDelimiter{\Inorm}{\|}{\|_1}
+\DeclarePairedDelimiter{\paren}{(}{)}
+\DeclarePairedDelimiter{\Paren}{\bigg(}{\bigg)}
+\DeclarePairedDelimiter{\bracket}{[}{]}
+\DeclarePairedDelimiter{\Bracket}{\bigg[}{\bigg]}
+\DeclarePairedDelimiter{\Brace}{\bigg\{}{\bigg\}}
+%----------------------------------------------------------%
+%% mathematical symbols
+\newcommand{\tjSet}{\mathcal{W}}
+\newcommand{\carSet}{\mathcal{M}}
+\newcommand{\Stat}{\mathbf{S}}
+\newcommand{\Policy}{\vecG{\Omega}}
+\newcommand{\TransD}{\mathbf{D}}
+\newcommand{\Diag}{\text{Diag}}
+%----------------------------------------------------------%
+%% terminology symbols
+\newcommand{\IAV}{DCV}
+\newcommand{\IAVs}{\IAV{s}}
+\newcommand{\IAVFullname}{data collection vehicle}
+\newcommand{\IAVFullnames}{\IAVFullname{s}}
+\newcommand{\fwName}{FedCars}
+%----------------------------------------------------------%
+%% extended comments
+\newcommand{\fixit}[1]{{\leavevmode\color{red}#1}}
+\newcommand{\nice}[1]{{\leavevmode\color{black}#1}}
+\newcommand{\accept}[1]{#1}
+\newcommand{\delete}[2]{}
+\newcommand{\needref}[1]{{\leavevmode\color{red}[#1]}}
+%---------------------------------------------------------------%
+%% review comments
+\newcommand{\extension}[1]{} %{{ \leavevmode\color{blue}#1 }}
+\newcommand{\transition}[1]{{ \leavevmode\color{black}#1 }}
+\newcommand{\wangr}[1]{{\leavevmode\color{orange}#1}}
+\newcommand{\hongyc}[1]{{\leavevmode\color{purple}#1}}
+\newcommand{\tann}[1]{{\leavevmode\color{blue}#1}}
+%---------------------------------------------------------------%
+
+%---------------------------------------------------------------%
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+%---------------------------------------------------------------%
+\IEEEoverridecommandlockouts
+\begin{document}
+    \title{
+      {\fwName}: An Efficient Scheduling Framework for In-Vehicle Federated Learning 
+      Integrated with CARLA-Cosimulation
+    }
+    \author{
+        Yuncong~Hong,
+        Bojie~Lv,
+        Shuai~Wang,
+        Rui~Wang,
+        Haisheng~Tan,
+        Francis~C.M.~Lau
+        \thanks{
+          Y. Hong is with Southern University of Science and Technology (SUSTech), and the University of Hong Kong (HKU) (email: ychong@cs.hku.hk).
+        }
+        \thanks{
+          B. Lv and R. Wang are with the Department of Electrical and Electronic Engineering, Southern University of Science and Technology (SUSTech), Shenzhen, China (email: lvbj@mail.sustech.edu.cn, wang.r@sustech.edu.cn).
+        }
+        \thanks{
+          S. Wang is with the Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences (CAS), Shenzhen 518055, China (email: s.wang@siat.ac.cn).
+        }
+        \thanks{
+          H. Tan is with the LINKE Lab,  University of Science and Technology of China (USTC), Hefei, China (email: hstan@ustc.edu.cn).
+        }%
+        \thanks{
+          F.C.M. Lau is with the Department of Computing Science, the University of Hong Kong (HKU), Hong Kong (email: fcmlau@cs.hku.hk).
+        }%
+    }
+
+    % \input{src/00-abstract}
+    \maketitle
+    \input{src/00-abstract}
+
+    \input{src/01-intro}
+    % \input{src/02b-motivation}
+    \input{src/03a-model}
+    \input{src/03b-formulation}
+    % \input{src/04a1-algorithm}  % algorithm with reference trajectory
+    \input{src/04a2-algorithm}    % algorithm with expected trajectory
+    \input{src/05-evaluation}
+    \input{src/06-conclusion}
+    \input{src/99-appendix}
+
+    \ifCLASSOPTIONcaptionsoff
+        \newpage
+    \fi
+
+    \bibliographystyle{IEEEtrans}
+    \bibliography{references/related.bib}
+
+\end{document}

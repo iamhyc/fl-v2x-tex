@@ -1,0 +1,174 @@
+\appendices
+
+\section{ Proof of Lemma \ref{lemma:local_rate_opt} }
+\label{append_1}
+The original optimization problem is convex, and we discuss the solution according to the sign of $\Delta{r}_{m,t_i}$. In the case of $\Delta{r}_{m,t_i} \leq 0$, we have $\Delta{r}_{m,\tau} \geq 0$ ($\tau=t_i+1, \dots, T^{(k,*)}$).
+Therefore, let $\lambda \in \domR_+$ and $\vecG{\mu} \in \domR^{(T^{(k,*)}-t_i)}_+$ denote the Lagrangian multipliers, the corresponding Lagrangian of the convex optimization problem is given as follows:
+\begin{align*}
+    L( \Delta{\slide{r}}^{(k,i)}_{m}, \lambda, \vecG{\mu} ) =
+    &\sum_{\tau=t_i+1}^{T^{(k,*)}} \gamma^{(k,*)}_{m,\tau} p_{m,\tau}( r^{(k,i)}_{m,\tau} - \Delta{r}_{m,\tau} )
+    \nonumber\\
+    &+ \lambda \Paren{ \sum_{\tau=t_i+1}^{T^{(k,*)}} \Delta{r}_{m,\tau} - \Delta{r}_{m,t_i} }
+    \nonumber\\
+    &- \sum_{j=1}^{T^{(k,*)}-t_i} \mu_{j} \Delta{r}_{m,t_i+j}.
+\end{align*}
+
+The Karush-Kuhn-Tucker (KKT) \cite{boyd-convex} conditions for the original convex optimization problem are
+\begin{enumerate}
+    \item \textbf{primal constraints}:
+    \begin{align*}
+        \sum_{\tau=t_i+1}^{T^{(k,*)}} \Delta{r}_{m,\tau} - \Delta{r}_{m,t_i} &\leq 0,
+        \\
+        \Delta{\slide{r}}^{(k,i)}_{m} \vecG{\mu}^T &= 0
+    \end{align*}
+    \item \textbf{dual constraint}:
+    $$
+    \lambda \geq 0
+    $$
+    \item \textbf{complementary slackness}:
+    $$
+    \lambda (\sum_{\tau=t_i+1}^{T^{(k,*)}} \Delta{r}_{m,\tau} - \Delta{r}_{m,t_i}) = 0
+    $$
+    \item \textbf{stationarity}:
+    $$
+    \nabla_{\Delta{\slide{r}}^{(k,i)}_{m}} L( \Delta{\slide{r}}^{(k,i)}_{m}, \lambda, \vec{\mu} )
+    = \vec{0},
+    $$
+    i.e.,
+    $$
+    - \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j} - \Delta{r}_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}} + \lambda - \mu_j = 0,
+    \forall j.
+    $$
+\end{enumerate}
+
+According to $\Delta{\slide{r}}^{(k,i)}_{m} \vecG{\mu}^T = 0$, we have the following statement:
+if $\mu_j > 0$, then $\Delta{r}_{m,t_i+j} = 0$ and
+$$
+\lambda < \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}}, \forall j.
+$$
+Moreover, we could further conclude that: $\Delta{r}_{m,t_i+j} > 0$ if
+$$
+\lambda \geq \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}}.
+$$
+% \begin{itemize}
+%     \item if $\mu_j > 0$, then $\Delta{r}_{m,t_i+j} = 0$ and the following inequality holds:
+%     $$
+%     \lambda < \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}}, \forall j.
+%     $$
+%     We further conclude that: if $\lambda \geq \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}}$, then $\Delta{r}_{m,t_i+j} > 0$.
+%     \item if $\mu_j = 0$, then $\Delta{r}_{m,t_i+j} \geq 0$, and we have
+%     $$
+%     \Delta{r}_{m,\tau} = - r^{(k,i)}_{m,\tau} + T_sB_0 \gamma^{(k,*)}_{m,\tau} \log_2{\frac{\lambda \cdot T_sB_0}{\ln{2} \mathbb{E}[l^{\epsilon}_{m,\tau}]}}, \forall \tau>t_i.
+%     $$
+% \end{itemize}
+Therefore, $\Delta{r}_{m,t_i+j}$ ($\forall j$) is either positive or zero depending on the scalar value $\lambda$.
+Hence, for sufficiently small $\Delta{r}_{m,t_i}$ w.r.t non-trivial optimal solution $\lambda^* > 0$, there is only one non-zero rate allocation whose index is given below.
+$$
+\hat{\tau}_{m} = \arg\max_{\tau} \mathbb{E}\Bracket{ l_{m,\tau}^{\epsilon}~|~\vec{d}_{m,t_i} }
+                          \cdot 2^{\frac{r^{(k,i)}_{m,\tau}}{T_sB_0 \gamma^{(k,*)}_{m,\tau}}}.
+$$
+
+Similarly, in the case of $\Delta{r}_{m,t_i} \ge 0$, let $\Delta{\slide{r}}^{(k,i)'}_{m} = - \Delta{\slide{r}}_{m,t_i}$, we have the expression of Lagrangian $L'(\cdot)$ w.r.t $\Delta{\slide{r}}^{(k,i)'}_{m,t_i}$ as follows:
+\begin{align*}
+    L'( \Delta{\slide{r}}^{(k,i)'}_{m}, \lambda, \vecG{\mu} ) =
+    &\sum_{\tau=t_i+1}^{T^{(k,*)}} \gamma^{(k,*)}_{m,\tau} p_{m,\tau}( r^{(k,i)}_{m,\tau} + \Delta{r}'_{m,\tau} )
+    \nonumber\\
+    &- \lambda \Paren{ \sum_{\tau=t_i+1}^{T^{(k,*)}} \Delta{r}_{m,\tau} - \Delta{r}_{m,t_i} }
+    \nonumber\\
+    &- \sum_{j=1}^{T^{(k,*)}-t_i} \mu_{j} \Delta{r}_{m,t_i+j}.
+\end{align*}
+Therefore, the only difference compared to the analysis in previous case exists in stationarity constraint, where
+$$
+\frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,t_i+j}] \cdot 2^{\frac{r^{(k,i)}_{m,t_i+j} - \Delta{r}'_{m,t_i+j}}{T_sB_0 \gamma^{(k,*)}_{m,t_i+j}}} + \lambda - \mu_j = 0,
+    \forall j.
+$$
+Hence, for sufficiently small $\Delta{r}_{m,t_i}$, the index of the non-zeros rate allocation is the {\it smallest one} which satisfies the corresponding constraint, i.e.,
+$$
+\breve{\tau}_{m} = \arg\min_{\tau} \mathbb{E}\Bracket{ l_{m,\tau}^{\epsilon}~|~\vec{d}_{m,t_i} }
+                          \cdot 2^{\frac{r^{(k,i)}_{m,\tau}}{T_sB_0 \gamma^{(k,*)}_{m,\tau}}}.
+$$
+
+\section{ Proof of Lemma \ref{lemma:local_approx_solution} }
+\label{append_2}
+Given the selected time slot $\tau$ in Lemma \ref{lemma:local_rate_opt}, the corresponding optimal rate allocation is given as follows:
+\begin{align*}
+    \min_{ \Delta{r}_{m,t_i} } &\gamma^{(k,*)}_{m,t_i} p_{m,t_i}( r^{(k,i)}_{m,t_i} + \Delta{r}_{m,t_i} )
+    \nonumber\\
+    &+ \gamma^{(k,*)}_{m,\tau} p_{m,\tau}( r^{(k,i)}_{m,\tau} - \Delta{r}_{m,t_i} )
+    % \nonumber\\
+    % \text{s.t.~}& \Delta{r}_{m,t_i} < r^{(k,i)}_{m,\tau}
+    % \nonumber\\
+    % & -\Delta{r}_{m,t_i} < r^{(k,i)}_{m,t_i}
+\end{align*}
+The solution to the above optimization problem is easy to obtain by taking its derivative w.r.t $\Delta{r}_{m,t_i}$ and setting it to zero, i.e.,
+$$
+\frac{\ln{2}}{T_sB_0} l^{\epsilon}_{m,t_i} 2^{\frac{r^{(k,i)}_{m,t_i} + \Delta{r}_{m,t_i}}{T_sB_0 \gamma^{(k,*)}_{m,t_i}}}
++ \frac{\ln{2}}{T_sB_0} \mathbb{E}[l^{\epsilon}_{m,\tau}] 2^{\frac{r^{(k,i)}_{m,\tau} - \Delta{r}_{m,t_i}}{T_sB_0 \gamma^{(k,*)}_{m,\tau}}} = 0,
+$$
+and the solution is as follows:
+\begin{align*}
+    \Delta{r}_{m,t_i} =
+    &\frac{
+        T_sB_0 \gamma^{(k,*)}_{m,t_i} \gamma^{(k,*)}_{m,\tau} \paren{ \log_2{ \mathbb{E}[l^{\epsilon}_{m,\tau}] } - \log_2{l^{\epsilon}_{m,t_i}} } 
+    }{
+        \gamma^{(k,*)}_{m,t_i} + \gamma^{(k,*)}_{m,\tau}
+    }
+    \nonumber\\
+    &+ \frac{
+        r^{(k,*)}_{m,\tau}\gamma^{(k,*)}_{m,t_i} - r^{(k,*)}_{m,t_i}\gamma^{(k,*)}_{m,\tau} 
+    }{
+        \gamma^{(k,*)}_{m,t_i} + \gamma^{(k,*)}_{m,\tau}
+    }.
+\end{align*}
+
+\section{ Proof of Theorem \ref{theorem:performance_analysis} }
+\label{append_3}
+In the following, we show that each global or local optimization of transmit time or power according to the current system state will suppress the system cost.
+In the $t_i$-th time slot where $t_i=kN+i$ ($\forall k,i$),
+let 
+\begin{align*}
+    \bar{\Policy} = \Brace{ \gamma^{(k,*)}_{m,\tau}, r^{(k,i-1)}_{m,\tau} | \forall m\in\carSet, \tau=t_i,\dots,T^{(k,*)} }
+\end{align*}
+denotes the policy on the right-hand-side of equation \eqref{eqn:performance_bound}, which is a state-invariant policy.
+Let
+\begin{align*}
+    \mat{L} \define \Paren{ \vec{d}_{t_i}, \dots, \vec{d}_{\T} }
+\end{align*}
+denotes the trajectory of random system states of {\IAVs} from the $t_i$-th time slot to the maximum scheduling period $\T$ where $\vec{d}_{\tau} = [ \vec{d}_{m,\tau} ]_m$ ($\forall \tau$),
+and $\Baseline_{L}$ denotes the fixed proposed policy along the trajectory $\mat{L}$.
+Therefore, for the fixed trajectory $\mat{\bar{l}} = ( \bar{\vec{d}}_{t_i}, \dots, \bar{\vec{d}}_{\T} )$, the proposed policy $\Baseline_{\bar{l}}$ updates the resource allocation only once at the $t_i$-th slot and we have:
+\begin{align*}
+    V^{\Baseline_{\bar{l}}}_{t_i}( \Stat_{t_i} ) &= g_{t_i}\Paren{ \Stat_{t_i}, \Baseline_{\bar{l}}(\Stat_{t_i}) } + \mathbb{E}\bracket{ V^{ \Baseline_{\bar{l}} }( \Stat_{t_i+1} ) }
+    \nonumber\\
+    &\leq g_{t_i}\Paren{ \Stat_{t_i}, \bar{\Policy}(\Stat_{t_i}) } + \mathbb{E}\bracket{ V^{ \bar{\Policy} }( \Stat_{t_i+1} ) }
+    \nonumber\\
+    &= T^{(k,*)} + \omega \sum_{\tau=t_i, m} \gamma^{(k,*)}_{m,\tau} \mathbb{E}\bracket{ p( \gamma^{(k,*)}_{m,\tau}, r^{(k,i-1)}_{m,\tau} ) }
+\end{align*}
+Moreover, let
+$$
+\mat{L}^{(n)} = ( \bar{\vec{d}}_{t_i}, \dots, \bar{\vec{d}}_{t_i+n-1}, \vec{d}_{t_i+n}, \dots,  \vec{d}_{\T})
+$$
+denote a series of trajectories where the first $n$ elements are fixed and the rest are random ($n=1,\dots,\T-t_i+1$).
+Specifically, $\mat{L}^{(0)} = \mat{L}$, and $\mat{L}^{(\T-t_i+1)} = \bar{l}$ is the fixed expected trajectory.
+According to the policy improvement in the solution to Problem \textbf{P2$(k)$} at the start of super slot and Problem \textbf{P3$(k,m)$} for local rate allocation, the policy update between any two adjacent time slot resembles the \emph{policy improvement} step, and we have
+$V^{\Baseline_{\mat{L}^{(n)}}}_{t_i}( \Stat_{t_i} ) \leq V^{\Baseline_{\mat{L}^{(n+1)}}}_{t_i}( \Stat_{t_i} )$.
+Therefore, we have the following inequality holds:
+\begin{align*}
+    V^{\Baseline_{\mat{L}}}_{t_i}( \Stat_{t_i} ) &\leq V^{\Baseline_{\mat{L}^{(1)}}}_{t_i}( \Stat_{t_i} )
+    \nonumber\\
+    &\leq \dots
+    \nonumber\\
+    &\leq
+    V^{\Baseline_{\mat{L}^{(n)}}}_{t_i}( \Stat_{t_i} ) \leq
+    V^{\Baseline_{\mat{L}^{(n+1)}}}_{t_i}( \Stat_{t_i} )
+    \nonumber\\
+    &\leq \dots
+    \nonumber\\
+    &\leq V^{\Baseline_{\mat{L}^{(\T-t_i)}}}_{t_i}( \Stat_{t_i} ) \leq V^{\Baseline_{\bar{l}}}_{t_i}( \Stat_{t_i} ).
+\end{align*}
+As a result, the inequality in equation \eqref{eqn:performance_bound} holds, i.e.,
+\begin{align*}
+    V^{\Baseline}_{t_i}( \Stat_{t_i} ) &\leq V^{\Baseline_{\bar{l}}}_{t_i}( \Stat_{t_i} )
+    \nonumber\\
+    &\leq T^{(k,*)} + \omega \sum_{\tau=t_i, m} \gamma^{(k,*)}_{m,\tau} \mathbb{E}\bracket{ p( \gamma^{(k,*)}_{m,\tau}, r^{(k,i-1)}_{m,\tau} ) }.
+\end{align*}

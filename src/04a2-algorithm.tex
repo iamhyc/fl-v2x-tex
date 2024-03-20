@@ -1,0 +1,347 @@
+\section{Global Super-Slot-Scale Optimization}
+\label{sec:kernel-policy}
+The problem P2$(k)$ could be of a large scale when the number of remaining time slots is large. In this section, a large-scale optimization method is proposed.
+Note that the time and throughput allocation ($\mat{\Gamma}^{(k,T)}, \mat{R}^{(k,T)}$) and scheduling period length $T$ are continuous and discrete, respectively, they can be optimized respectively. First, the optimization of P2$(k)$ given scheduling period length $T$ can be written as follows:
+\begin{align}
+    \textbf{P2$'(k,T)$:~}
+    \min_{ \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} } &F_k\paren{ T, \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} }
+    \\\nonumber
+    \text{s.t.~} & \text{ \eqref{eqn:p1_cons_second}, \eqref{eqn:p1_cons_last}, \eqref{eqn:p1_cons_first}, \eqref{eqn:constraint_T} }.
+\end{align}
+Although the problem \textbf{P2$'(k,T)$} is convex, the conventional algorithms may not be applied due to huge complexity.
+For example, the Newton interior method is of exponential computational complexity in the worst case \cite{monteiro1994}, which might be impractical for large $T$.
+To address this issue, an acceleration gradient projection method \cite{Nesterov83} is adopted with convergence rate of $O(1/k^2)$ and computational complexity $O(k (M\T)^2)$, where $k$ denotes the number of iterations.
+
+Let $\mat{R}^{(k,T)}_{0}, \mat{\Gamma}^{(k,T)}_{0}$ be an initial feasible solution satisfying the constraints \eqref{eqn:p1_cons_second}, \eqref{eqn:p1_cons_last}, \eqref{eqn:p1_cons_first}, and \eqref{eqn:constraint_T}.
+Moreover, define
+$$\mat{R}^{(k,T)}_{1}=\mat{R}^{(k,T)}_{0}, ~~\mat{\Gamma}^{(k,T)}_{1}=\mat{\Gamma}^{(k,T)}_{0}.$$
+The problem \textbf{P2$'(k,T)$} can be solved by conducting the following two steps iteratively until convergence. 
+
+\textbf{Step 1: Acceleration Point Calculation.}
+In the $i$-th iteration ($i=1,2,3,\dots$), the acceleration points, denoted as $\widetilde{\mat{R}}^{(k,T)}_{i}$ and $\widetilde{\mat{\Gamma}}^{(k,T)}_{i}$, are chosen as the following linear combination of $(\mat{R}^{(k,T)}_{i}, \mat{R}^{(k,T)}_{i-1})$ and $(\mat{\Gamma}^{(k,T)}_{i}, \mat{\Gamma}^{(k,T)}_{i-1})$, respectively:
+\begin{eqnarray*}
+    &\widetilde{\mat{R}}^{(k,T)}_{i} &= \mat{R}^{(k,T)}_{i} + \frac{c_{i-1}-1}{c_{i}} \Paren{
+        \mat{R}^{(k,T)}_{i} - \mat{R}^{(k,T)}_{i-1}
+    }\nonumber
+    \\
+    &\widetilde{\mat{\Gamma}}^{(k,T)}_{i} &= \mat{\Gamma}^{(k,T)}_{i} + \frac{c_{i-1}-1}{c_{i}}  \Paren{
+        \mat{\Gamma}^{(k,T)}_{i} - \mat{\Gamma}^{(k,T)}_{i-1} 
+    },\nonumber
+\end{eqnarray*}
+where
+\begin{align*}
+    c_{0} = 1, c_{i} = \frac{1}{2} \Paren{ 1+\sqrt{ 1+4(c_{i-1})^2 } }.
+\end{align*}
+
+\textbf{Step 2: Update and Projection.}
+Given the acceleration points, we define
+$$\widebar{\mat{R}}^{(k,T)}_{i} = \widetilde{\mat{R}}^{(k,T)}_{i} - \eta \frac{\partial{F_k}}{\partial \mat{R}^{(k,T)}} \bigg|_{\widetilde{\mat{R}}^{(k,T)}_{i}}$$
+and
+$$\widebar{\mat{\Gamma}}^{(k,T)}_{i} = \widetilde{\mat{\Gamma}}^{(k,T)}_{i} - \eta \frac{\partial{F_k}}{\partial \mat{\Gamma}^{(k,T)}} \bigg|_{\widetilde{\mat{\Gamma}}^{(k,T)}_{i}}$$
+where
+\begin{align*}
+    \frac{\partial{F_k}}{\partial \mat{R}^{(k,T)}} = \Bracket{
+        &\xi_{m,\tau+kN} \mathbb{E}\bracket{ l_{m,\tau+kN}^{\epsilon} } \cdot
+        2^{ \frac{r_{m,\tau+kN}}{\gamma_{m,\tau+kN} T_s B_0} }
+        \nonumber\\
+        &~~~~~~~~~~~~~~~~\cdot \paren{ \frac{\ln{2}}{T_s B_0} }
+    }_{1 \leq m \leq M, 1 \leq \tau \leq T-kN},
+    \\
+    \frac{\partial{F_k}}{\partial \mat{\Gamma}^{(k,T)}} = \Bracket{
+        &\xi_{m,\tau+kN} \mathbb{E}\bracket{ l_{m,\tau+kN}^{\epsilon} }
+        \cdot 2^{ \frac{r_{m,\tau+kN}}{\gamma_{m,\tau+kN} T_s B_0} }
+        \nonumber\\
+        &\cdot \paren{1 - \frac{\ln{2}}{T_s B_0} \frac{r_{m,\tau+kN}}{\gamma_{m,\tau+kN}}}
+    }_{1 \leq m \leq M, 1 \leq \tau \leq T-kN},
+\end{align*}
+ and $\eta$ is the constant gradient step size. Then the time and throughput allocations of the $i$-th iteration are updated as
+\begin{align}
+    \Paren{
+        \mat{R}^{(k,T)}_{i+1}, &\mat{\Gamma}^{(k,T)}_{i+1}
+    } = \mathcal{P}_{\C}\Paren{ \widebar{\mat{R}}^{(k,T)}_{i}, \widebar{\mat{\Gamma}}^{(k,T)}_{i} },
+    \label{eqn:update_projection}
+\end{align}
+where $\mathcal{P}_{\C}$ denotes the projection of the matrix
+$\widebar{\mat{R}}^{(k,T)}_{i}$ and $\widebar{\mat{\Gamma}}^{(k,T)}_{i}$
+onto the constraint space $\C$ confined by equations \eqref{eqn:p1_cons_second}, \eqref{eqn:p1_cons_last}, \eqref{eqn:p1_cons_first} and \eqref{eqn:constraint_T}.
+
+Specifically, let $\widebar{\gamma}^{(k,i)}_{m,\tau}$ and $\widebar{r}^{(k,i)}_{m,\tau}$ be the $(m,\tau)$-th entries of the matrices $\widebar{\mat{\Gamma}}^{(k,T)}_{i}$ and $\widebar{\mat{R}}^{(k,T)}_{i}$, respectively, the projection in \eqref{eqn:update_projection} is equivalently to the following minimization problem:
+\begin{align}
+    &\Paren{ \mat{R}^{(k,T)}_{i+1}, \mat{\Gamma}^{(k,T)}_{i+1} }
+    = \arg\min_{ \paren{ \mat{R},\mat{\Gamma} } \in \C }
+            \nonumber\\
+            &~~~~~~~
+            \sum_{m\in\carSet} \sum_{\tau=kN+1}^{T}
+            \paren{ \widebar{\gamma}^{(k,i)}_{m,\tau} - \gamma_{m,\tau} }^{2} +
+            \paren{ \widebar{r}^{(k,i)}_{m,\tau} - r_{m,\tau} }^{2}.
+    \label{eqn:simplex_projection}
+\end{align}
+According to the proposition 2 of \cite{fast-projection}, the solution to the above projection is summarized in the following lemma.
+\begin{lemma}[Alternative Projection Onto Simplex and Hyperplane]
+    Let $\set{ \bar{\gamma}^{(m)}_{\tau} | \forall m\in\carSet }$ denote the descent sorting of $\set{ \bar{\gamma}^{(k,i)}_{m,\tau} | \forall m\in\carSet }$ in the $\tau$-th time slot ($\tau=kN+1,\dots,T$)
+    ,
+    and
+    $\set{ \bar{r}^{(\tau)}_{m} | \tau=1,2,\dots,T-kN }$ denote the descent sorting of $\set{\bar{r}^{(k,i)}_{m,\tau} | \tau=kN+1,\dots,T}$ for the $m$-th {\IAV}.
+    Thus,
+    $\bar{\gamma}^{(1)}_{\tau} \geq \dots \geq \bar{\gamma}^{(M)}_{\tau}$ and $\bar{r}^{(1)}_{m} \geq \dots \geq \bar{r}^{(T-kN)}_{m}$.
+    The solution of equation \eqref{eqn:simplex_projection} is given by
+    \begin{align*}
+        \mat{\Gamma}^{(k,T)}_{i+1} &= [\gamma^{(k,i+1)}_{m,kN+\tau}]_{1 \leq m \leq M, 1 \leq \tau \leq T-kN},
+        \\
+        \mat{R}^{(k,T)}_{i+1} &= [r^{(k,i+1)}_{m,kN+\tau}]_{1 \leq m \leq M, 1 \leq \tau \leq T-kN}.
+    \end{align*}
+    Moreover,
+    \begin{align}
+        \gamma^{(k,i+1)}_{m,\tau} = \Bracket{ \widebar{\gamma}^{(k,i)}_{m,\tau} &- \frac{\sum_{j=1}^{m'}\bar{\gamma}^{(j)}_{\tau} - 1}{m'} }^{+}
+        \\
+        r^{(k,i+1)}_{m,\tau} = \min\Paren{
+            &\Bracket{ \widebar{r}^{(k,i)}_{m,\tau} - \frac{\sum_{j=1}^{\tau'}u_{m,t} - \bar{r}^{(j)}_{m}}{\tau'} }^{+},
+            \nonumber\\
+            &T_s B_0 \log_2\paren{ \frac{P_{\max}}{ \xi_{m,\tau} \mathbb{E}[l^{\epsilon}_{m,\tau}]}} \gamma^{(k,i+1)}_{m,\tau}
+        }
+    \end{align}
+    where
+    $$m' = \max_{m} \set{m: {\sum_{j=1}^{m} \bar{\gamma}^{(j)}_{\tau} - 1 } <{m} \bar{\gamma}^{(m)}_{\tau}},$$ 
+    $$\tau' = \max_{\tau} \set{\tau: {\sum_{j=1}^{\tau} u_{m,t} - \bar{r}^{(j)}_{m}} <{\tau} \bar{r}^{(\tau)}_{m}}.$$
+    % repeat the above projection procedures unless $\widebar{\mat{\Gamma}}^{(k)}$ and $\widebar{\mat{R}}^{(k)}$ are feasible.
+\end{lemma}
+
+Denote ${\mat{\Gamma}^{(k,T,*)}}$ and ${\mat{R}^{(k,T,*)}}$ as the optimized time and throughput allocations of problem \textbf{P2$'(k,T)$} after convergence, the optimization of scheduling period duration can be written as follows.
+\begin{align}
+    \textbf{P2$''(k)$:~} & \min_{T} F_{k}  \Paren{T, {\mat{\Gamma}^{(k,T,*)}}, {\mat{R}^{(k,T,*)}} }.
+    \label{eqn:p2pp_k}
+\end{align}
+Note that the variable $T$ is an integer between $1$ and $\T$, a  bisection search algorithm is elaborated below to solve problem \textbf{P2$''(k)$}. Finally, the optimized scheduling period duration $T$ in problem \textbf{P2$''(k)$} is denoted as $T^{(k,*)}$, the corresponding optimized time and throughput allocations are denoted as $\mat{\Gamma}^{(k,*)}$ and  ${\mat{R}^{(k,*)}}$ respectively. 
+\begin{algorithm}[ht]
+    \caption{Bisection Search Algorithm for problem \textbf{P2$''(k)$}}\label{alg_bnb}
+    \DontPrintSemicolon
+    \KwOut{ $T^{(k,*)}$ }
+    % \KwOut{$\{ { \gamma^{*}_{m,\tau} }, { r^{*}_{m,\tau} } | \forall m\in\carSet, \tau=kN+1,\dots,{T}^{*} \}$}
+    $\tau_{l} \gets kN+1$, $\tau_{r} \gets \T$\;
+     $w_{r} \gets \min F_{k}( \tau_{r}, \mat{R}_{r}, \mat{\Gamma}_{r} )$ by solving \textbf{P2$'( k,\tau_{r} )$}\;
+    \While{ $\tau_{r} - \tau_{l} > 1$ }
+    {
+        $\tau_{mid} \gets \lfloor{ (\tau_{l} + \tau_{r})/2 }\rfloor$\;
+        $w_{mid} \gets \min F_{k}( \tau_{mid}, \mat{R}_{mid}, \mat{\Gamma}_{mid} )$ by solving \textbf{P2$'( k,\tau_{mid} )$}\;
+        \If{ $w_{r} - w_{mid} < 0$ }{
+            $\tau_{l} \gets \tau_{mid}$\; %g(x)/energy domains, moves right
+        }
+        \Else{
+            $\tau_{r} \gets \tau_{mid}$\; %f(x)/time domains, moves left
+            $w_{r} \gets w_{mid}$\;
+        }
+    }
+    \Return{ $T^{(k,*)} \gets \tau_{l}$ }\;
+\end{algorithm}
+
+\section{Local Slot-Scale Optimization}
+\label{sec:local-policy}
+
+In this section, the low-complexity algorithm solving the problem \textbf{P3$(k,m)$} without the offline value iteration is elaborated. Note that the local system state of the $m$-th {\IAV} consists of $\Stat_{m,t} =  ( u_{m,t}, \vec{d}_{m,t} )$, the Bellman's equations of problem \textbf{P3$(k,m)$} are given below.
+\begin{align*}
+    V_{m,t} & \paren{  u_{m,t}, \vec{d}_{m,t} }= \nonumber\\
+    & \min_{ r_{m,t} } \gamma^{(k,*)}_{m,t} p_{m,t} + \mathbb{E}_{ \vec{d}_{m,t+1} } V_{m,t+1}\paren{  u_{m,t}-r_{m,t}, \vec{d}_{m,t+1} },
+\end{align*}
+where the transmission power $p_{m,t}$ is a function of $\gamma^{(k,*)}_{m,t}$, $\vec{d}_{m,t}$ and $r_{m,t}$, and the local value function of the $m$-th {\IAV} in the $t$-th time slot is given by
+\begin{align}
+    V_{m,t} & (u_{m,t}, \vec{d}_{m,t}) \define 
+    \nonumber\\
+    &\min_{ \{\Policy^{R}_{m,t}|\forall t\} } \mathbb{E} \Bracket{ \sum_{\tau=t}^{T^{(k,*)}} g_{m,t}(u_{m,t}, \vec{d}_{m,t}, \Policy^{R}_{m,t}) }.
+\end{align}
+For the notation convenience, we define
+\begin{align}
+    \widetilde{V}_{m,t+1}&\paren{u_{m,t+1}, \vec{d}_{m,t}}
+    \nonumber\\
+    &\define \mathbb{E}_{ \vec{d}_{m,t+1} | \vec{d}_{m,t} } V_{m,t+1}\paren{  u_{m,t+1}, \vec{d}_{m,t+1} }.
+ \label{eqn:local_valfn_alt}
+\end{align}
+Hence, given the local value function and local system state, the optimal throughput allocation of the $m$-th {\IAV} in the $t_i$-th time slot, where  $t_i = kN + i$ and $i=1,2,\dots,N$, can be obtained via the following optimization problem.
+\begin{align}
+    \min_{ r_{m,t_i} } \gamma^{(k,*)}_{m,t_i} p_{m,t_i} (r_{m,t_i})+ \widetilde{V}_{m,t_i+1}\paren{u_{m,t_i}-r_{m,t_i}, \vec{d}_{m,t_i}}.
+    \label{eqn:local_valfn}
+\end{align}
+
+Although the dimension of local value function is much less than the global optimization in equation \eqref{eqn:p1_blm},
+the complexity of evaluating local value functions $V_{m,t}  (u_{m,t}, \vec{d}_{m,t})$ ($\forall t, u_{m,t}, \vec{d}_{m,t}$) or equivalently $\widetilde{V}_{m,t}(\cdot)$ is still high. Therefore, we propose a novel method to approximate the local value functions with the analytical expressions based on the reference throughput allocation. 
+Let
+$$\paren{ r^{(k,i-1)}_{m,t_i}, r^{(k,i-1)}_{m,t_i+1}, \dots, r^{(k,i-1)}_{m,T^{(k,*)}} }$$
+with 
+\begin{align}
+    \sum_{\tau=t_i}^{T^{(k,*)}} r^{(k,i-1)}_{m,\tau} = u_{m,t_i}
+    \label{eqn:reference_constraint}
+\end{align}
+be the reference throughput allocation for all the remaining time slots in the optimization of the $t_i$-th time slot, and
+\begin{align*}
+    \slide{r}^{(k,i-1)}_{m} = \paren{ r^{(k,i-1)}_{m,t_i+1}, r^{(k,i-1)}_{m,t_i+2}, \dots, r^{(k,i-1)}_{m,T^{(k,*)}} }
+\end{align*}
+be the corresponding reference throughput allocation for the future time slots. The optimization in equation \eqref{eqn:local_valfn} can be equivalently written as
+\begin{align}
+\textbf{P3$'(k,m,t_i)$:}& \min_{ \Delta r_{m,t_i} } \gamma^{(k,*)}_{m,t_i} p_{m,t_i} (r^{(k,i-1)}_{m,t_i}+\Delta r_{m,t_i}) \nonumber\\ 
+ +~&\widetilde{V}_{m,t_i+1}\paren{u_{m,t_i}-r^{(k,i-1)}_{m,t_i}-\Delta r_{m,t_i}, \vec{d}_{m,t_i}}.  \label{eqn:local_valfn_delta}
+ \\
+ \text{s.t.~}& p_{m,t_i}( r^{(k,i-1)}_{m,t_i} + \Delta{r}_{m,t_i} ) \leq P_{\max}
+\end{align}
+
+\subsection{Local Value Function Approximation}
+\label{subsec:local_valfn_approx}
+
+In this part, we approximate the expected local value function $\widetilde{V}_{m,t_i+1}\paren{\cdot}$ in equation \eqref{eqn:local_valfn_delta} via the reference throughput allocations $\slide{r}^{(k,i-1)}_{m}$.
+Let 
+\begin{align}
+    \widebar{G}_{m,t_i+1} & \paren{ \slide{r}^{(k,i-1)}_{m}, \vec{d}_{m,t_i} }
+    \define
+    \nonumber\\
+    &\sum_{\tau=t_i+1}^{T^{(k,*)}}
+    \mathbb{E}_{\vec{d}_{m,\tau}}\Bracket{
+        \gamma^{(k,*)}_{m,\tau} p_{m,\tau}\paren{ r_{m,\tau}^{(k,i-1)}}
+        ~|~\vec{d}_{m,t_i}
+    }
+\end{align}
+denote the expected cost of $m$-th {\IAV} since the $(t_i+1)$-th time slot with the reference throughput allocations $\slide{r}^{(k,i)}_{m} $ given the current location $\vec{d}_{m,t_i}$, and
+$$
+\Delta{\slide{r}^{(k,i)}_{m}} = (\Delta{r}_{m,t_i+1},\dots,\Delta{r}_{m,T^{(k,*)}})
+$$
+be the adjustment on the reference throughput allocation.
+We approximate the expected local value function $\widetilde{V}_{m,t_i+1}\paren{\cdot}$ in equation \eqref{eqn:local_valfn_delta} as follows:
+\begin{align}
+    \widetilde{V}_{m,t_i+1} & ( u_{m,t_i} -r^{(k,i-1)}_{m,t_i} -\Delta{r}_{m,t_i}, \vec{d}_{m,t_i} )  \approx
+    \nonumber\\
+     \min_{\Delta{\slide{r}^{(k,i)}_{m}}} & ~~~\widebar{G}_{m,t_i+1}\Paren{ \slide{r}^{(k,i-1)}_{m} + \Delta{\slide{r}^{(k,i)}_{m}}, \vec{d}_{m,t_i} }
+    \nonumber\\
+    \text{s.t.~} & ~~~ \sum_{\tau=t_i+1}^{T^{(k,*)}} \Delta{r}_{m,\tau} = \Delta{r}_{m,t_i}
+    \nonumber\\
+    & ~~~ \Delta{r}_{m,t_i} \times \Delta{r}_{m,\tau} \geq 0, \forall \tau = {t_i+1},\dots, T^{(k,*)}. \nonumber
+\end{align}
+The above first constraint is to ensure that the total number of transmission bits is $u_{m,t_i}$, and the second constraint is to limit the search space of $\Delta{\slide{r}^{(k,i)}_{m}}$. Moreover, we have the following conclusion on its asymptotic optimal solution.
+
+\begin{lemma}
+    \label{lemma:local_rate_opt}
+    Define the following indexes of time slots:
+     \begin{align}
+        \hat{\tau}_{m} &= \arg\max_{\tau} \mathbb{E}\Bracket{ l_{m,\tau}^{\epsilon}~|~\vec{d}_{m,t_i} }
+                          \cdot 2^{\frac{r^{(k,i)}_{m,\tau}}{T_s B_0 \gamma^{(k,*)}_{m,\tau}}},
+        \\
+        \breve{\tau}_{m} &= \arg\min_{\tau} \mathbb{E}\Bracket{ l_{m,\tau}^{\epsilon}~|~\vec{d}_{m,t_i} }
+                          \cdot 2^{\frac{r^{(k,i)}_{m,\tau}}{T_s B_0 \gamma^{(k,*)}_{m,\tau}}}.
+    \end{align}   
+    For sufficiently small $\Delta{r}_{m,t_i}$, the following solution is asymptotically optimal:
+    \begin{itemize}
+        \item If $\Delta{r}_{m,t_i} > 0$, all the entries of $\Delta{\slide{r}^{(k,i)}_{m}}$ is $0$ except that $\Delta{r}_{m,\hat{\tau}_{m}} = \Delta{r}_{m,t_i}$;
+        \item If $\Delta{r}_{m,t_i} < 0$, all the entries of $\Delta{\slide{r}^{(k,i)}_{m}}$ is $0$ except that $\Delta{r}_{m,\breve{\tau}_{m}} = \Delta{r}_{m,t_i}$;
+    \end{itemize}
+\end{lemma}
+\begin{proof}
+    Please refer to the Appendix \ref{append_1}.
+\end{proof}
+As a result, the expected value function can be approximated as follows:
+\begin{align}
+    &\widetilde{V}_{m,t_i+1}\paren{ u_{m,t_i}-r^{(k,i-1)}_{m,t_i}-\Delta{r}_{m,t_i}, \vec{d}_{m,t_i} }
+    \nonumber\\
+    &\approx
+    \begin{cases}
+        \widebar{G}_{m,t_i+1}\paren{ \slide{r}^{(k,i-1)}_{m} + \vec{e}_{\hat{\tau}_{m}} \Delta{r}_{m,t_i}, \vec{d}_{m,t_i} }, & \Delta{r}_{m,t_i} > 0
+        \\
+        \widebar{G}_{m,t_i+1}\paren{ \slide{r}^{(k,i-1)}_{m} + \vec{e}_{\breve{\tau}_{m}} \Delta{r}_{m,t_i}, \vec{d}_{m,t_i} }, & \Delta{r}_{m,t_i} < 0
+    \end{cases}. \label{eqn:local-value-app}
+\end{align}
+In the above expressions, $\vec{e}_{\tau}$ denotes the vector whose $\tau$-th dimension is one and other dimensions are zero.
+
+\subsection{Online Scheduling}
+\label{subsec:local_opt}
+With the local value function approximation in the previous part, the local throughput allocation of the $m$-th {\IAV} in the $t_i$-th slot can be determined by solving problem \textbf{P3$'(k,m,t_i)$}. We first introduce the following conclusion.
+\begin{lemma}
+    \label{lemma:local_approx_solution}
+    With the approximation of local value function in \eqref{eqn:local-value-app}, the optimal solution of problem \textbf{P3$'(k,m,t_i)$} is within the set $\{f_{m,t_i}(\hat{\tau}_m),f_{m,t_i}(\breve{\tau}_m) \}$, where
+    \begin{align}
+        f_{m,t_i}(\tau_m) \define
+        \min\Paren{
+            &\frac{
+                T_sB_0 \gamma^{(k,*)}_{m,t_i} \gamma^{(k,*)}_{m,\tau} \paren{ \log_2{ \mathbb{E}[l^{\epsilon}_{m,\tau_m}] } - \log_2{l^{\epsilon}_{m,t_i}} } 
+            }{
+                \gamma^{(k,*)}_{m,t_i} + \gamma^{(k,*)}_{m,\tau_m}
+            }
+            \nonumber\\
+            &+\frac{
+                r^{(k,*)}_{m,\tau_m}\gamma^{(k,*)}_{m,t_i} - r^{(k,*)}_{m,t_i}\gamma^{(k,*)}_{m,\tau_m} 
+            }{
+                \gamma^{(k,*)}_{m,t_i} + \gamma^{(k,*)}_{m,\tau_m}
+            },
+            \Delta{r}^{\max}_{m,t_i}
+        },
+    \end{align}
+    where $p_{m,t_i}( r^{(k,i-1)}_{m,t_i} + \Delta{r}^{\max}_{m,t_i} ) = P_{\max}$.
+\end{lemma}
+\begin{proof}
+    Please refer to the Appendix \ref{append_2}.
+\end{proof}
+
+Hence, the optimized throughput allocation of the $m$-th {\IAV} in the $t_i$-th slot is denoted by
+\begin{align}
+    r^{(k,i)}_{m,t_i} = r^{(k,i-1)}_{m,t_i}+f_{m,t_i}(\tau_m^*), \label{eqn:throughput}
+\end{align}
+where 
+\begin{align}
+    \tau_m^*=& \arg \min_{ \tau_m\in \{\hat{\tau}_m,\breve{\tau}_m\} } \gamma^{(k,*)}_{m,t_i} p_{m,t_i} (r^{(k,i-1)}_{m,t_i}+f_{m,t_i}(\tau_m)) \nonumber\\
+ & + \widebar{G}_{m,t_i+1}\paren{ \slide{r}^{(k,i-1)}_{m} + \vec{e}_{\tau_{m}} f_{m,t_i}(\tau_m), \vec{d}_{m,t_i} }.
+    \label{eqn:opt_tau}
+\end{align}
+
+\subsection{Proposed Policy and Performance Bound}
+As a result of global super-slot-scale optimization and local slot-scale optimization, the proposed policy, denoted as $\Baseline$, is summarized below.
+\begin{definition}[Proposed Policy $\Baseline$]
+    \label{def:baseline}
+    In the $t_i$-th time slot where $t_i=kN+i$ ($\forall k,i$),
+    the transmission time allocation of {\IAVs} $[ \gamma^{\Baseline}_{m,t_i}]_m$ is obtained by solving problem \textbf{P2$(k)$} every super slot, and the uplink throughput allocation $[ r^{\Baseline}_{m,t_i}]_m$ is obtained from equation \eqref{eqn:throughput} with the reference throughput allocation
+    $\paren{ r^{(k,i-1)}_{m,t_i}, r^{(k,i-1)}_{m,t_i+1}, \dots, r^{(k,i-1)}_{m,T^{(k,*)}} }$.
+    Hence,  $$\gamma^{\Baseline}_{m,t_i}=\gamma^{(k,*)}_{m,t_i} \mbox{ and } r^{\Baseline}_{m,t_i} = r^{(k,i)}_{m,t_i}, \ \forall m.$$
+\end{definition}
+
+Although arbitrary reference throughput allocation satisfying equation \eqref{eqn:reference_constraint} can be used in the above approximation of local value function, the following initialization and iterative update of reference throughput allocation could lead to a non-trivial bound of the proposed algorithm. 
+\begin{itemize}
+    \item {\bf Initialization:} When $i=1$, 
+    \begin{align}
+        r^{(k,1)}_{m,\tau} = r^{(k,*)}_{m,\tau}, \forall \tau = t_{1}, \dots, T^{(k,*)}\nonumber,
+    \end{align}
+    where $r^{(k,*)}_{m,\tau}$ is obtained from problem {\bf P2}$(k)$.
+    \item {\bf Update:} When $i>1$,
+    \begin{align}
+    r^{(k,i)}_{m,\tau} = 
+    \begin{cases}
+        r^{(k,i-1)}_{m,\tau} + f_{m,t_{i}}(\tau_m^*), &\tau=t_i
+        \\
+        r^{(k,i-1)}_{m,\tau} - f_{m,t_{i}}(\tau_m^*), &\tau=\tau^*_{m}
+        \\
+        r^{(k,i-1)}_{m,\tau}, &\tau \neq t_i, \tau^*_{m}
+    \end{cases}
+    \label{eqn:approx_solution}
+\end{align}
+\end{itemize}
+
+Let $V^{\Baseline}_{t}(\Stat_{t})$ be the value function of the proposed policy $\Baseline$ with the system state $\Stat_{t}$ in the $t$-th time slot. Thus,
+\begin{align}
+    V^{\Baseline}_{t}(\Stat_{t}) \define  \mathbb{E}_{\Stat_{t},\dots,\Stat_{\T}}
+    \Bracket{
+        \sum_{\tau=t}^{\T} g_{\tau}\paren{ \Stat_{\tau}, [ \gamma^{\Baseline}_{m,t}]_m, [r^{\Baseline}_{m,t}]_m} | \Stat_{t}
+    }.
+    \label{eqn:val_baseline}
+\end{align}
+We have the following conclusion on the performance bound.
+
+\begin{theorem}[Analytical Performance Bound]
+    \label{theorem:performance_analysis}
+    In the $t_i$-th time slot where $t_i=kN+i$ ($\forall k,i$),
+    % for sufficiently large $P_{\max}$,
+    we have
+    \begin{align}
+        &V^{\Baseline}_{t_i}(\Stat_{t_i})
+        \nonumber\\
+        &~~~~\leq T^{(k,*)} + \omega \sum_{m,\tau=t_i}^{T^{(k,*)}} \gamma^{(k,*)}_{m,\tau} \mathbb{E}\bracket{ p_{m,\tau}( \gamma^{(k,*)}_{m,\tau}, r^{(k,i-1)}_{m,\tau} ) | \Stat_{t_i} },
+        \label{eqn:performance_bound}
+    \end{align}
+    where the RHS represents the average cost with
+    time allocation $\{\gamma^{(k,*)}_{m,\tau}\}$ obtained at the start of the $k$-th super slot, and throughput allocation $\{r^{(k,i-1)}_{m,\tau}\}$ obtained in the $(t_i-1)$-th time slot.
+    % time and throughput allocation $\{\gamma^{(k,*)}_{m,\tau}\}$ and $\{r^{(k,i-1)}_{m,\tau}\}$, respectively.
+\end{theorem}
+\begin{proof}
+    Please refer to Appendix \ref{append_3}.
+\end{proof}
