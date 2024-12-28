@@ -130,10 +130,10 @@ let
     \bar{\Policy} = \Brace{ \gamma^{(k,*)}_{m,\tau}, r^{(k,i-1)}_{m,\tau} | \forall m\in\carSet, \tau=t_i,\dots,T^{(k,*)} }
 \end{align*}
 denotes the policy on the right-hand-side of equation \eqref{eqn:performance_bound}, which is a state-invariant policy.
-Let
-\begin{align*}
-    \mat{L} \define \Paren{ \vec{d}_{t_i}, \dots, \vec{d}_{\T} }
-\end{align*}
+Let $\mat{L} \define \paren{ \vec{d}_{t_i}, \dots, \vec{d}_{\T} }$
+% \begin{align*}
+%     \mat{L} \define \Paren{ \vec{d}_{t_i}, \dots, \vec{d}_{\T} }
+% \end{align*}
 denotes the trajectory of random system states of {\IAVs} from the $t_i$-th time slot to the maximum scheduling period $\T$ where $\vec{d}_{\tau} = [ \vec{d}_{m,\tau} ]_m$ ($\forall \tau$),
 and $\Baseline_{L}$ denotes the fixed proposed policy along the trajectory $\mat{L}$.
 Therefore, for the fixed trajectory $\mat{\bar{l}} = ( \bar{\vec{d}}_{t_i}, \dots, \bar{\vec{d}}_{\T} )$, the proposed policy $\Baseline_{\bar{l}}$ updates the resource allocation only once at the $t_i$-th slot and we have:

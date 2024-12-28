@@ -24,6 +24,8 @@
 \usepackage{tabulary}
 \usepackage{bbm}
 \DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+
 %---------------------------------------------------------------%
 %% the pretty \widebar symbol: 
 \makeatletter
@@ -169,7 +171,7 @@
 \newcommand{\transition}[1]{{ \leavevmode\color{black}#1 }}
 \newcommand{\wangr}[1]{{\leavevmode\color{orange}#1}}
 \newcommand{\hongyc}[1]{{\leavevmode\color{purple}#1}}
-\newcommand{\tann}[1]{{\leavevmode\color{blue}#1}}
+\newcommand{\revise}[1]{{\leavevmode\color{black}#1}}
 %---------------------------------------------------------------%
 
 %---------------------------------------------------------------%
@@ -185,24 +187,30 @@
     \author{
         Yuncong~Hong,
         Bojie~Lv,
-        Shuai~Wang,
-        Rui~Wang,
-        Haisheng~Tan,
-        Francis~C.M.~Lau
+        Shuai~Wang,~\IEEEmembership{Senior Member,~IEEE,} 
+        Rui~Wang,~\IEEEmembership{Member,~IEEE,} \\
+        Haisheng~Tan,~\IEEEmembership{Senior Member,~IEEE,} 
+        and~Francis~C.M.~Lau
         \thanks{
-          Y. Hong is with Southern University of Science and Technology (SUSTech), and the University of Hong Kong (HKU) (email: ychong@cs.hku.hk).
+            Copyright (c) 2024 IEEE. Personal use of this material is permitted. However, permission to use this material for any other purposes must be obtained from the IEEE by sending a request to pubs-permissions@ieee.org.
         }
         \thanks{
-          B. Lv and R. Wang are with the Department of Electrical and Electronic Engineering, Southern University of Science and Technology (SUSTech), Shenzhen, China (email: lvbj@mail.sustech.edu.cn, wang.r@sustech.edu.cn).
+            This work was supported in part by the National Natural Science Foundation of China under Grant 62171213 and 62371444, and in part by the High level of special funds under Grant G03034K004. {\it (Corresponding author: Rui Wang.)}
         }
         \thanks{
-          S. Wang is with the Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences (CAS), Shenzhen 518055, China (email: s.wang@siat.ac.cn).
+          Yuncong Hong is with the Southern University of Science and Technology (SUSTech) and the University of Hong Kong (HKU) (email: ychong@cs.hku.hk).
         }
         \thanks{
-          H. Tan is with the LINKE Lab,  University of Science and Technology of China (USTC), Hefei, China (email: hstan@ustc.edu.cn).
+          Bojie Lv and Rui Wang are with the Department of Electrical and Electronic Engineering, Southern University of Science and Technology (SUSTech), Shenzhen, China (email: lvbj@mail.sustech.edu.cn, wang.r@sustech.edu.cn).
+        }
+        \thanks{
+          Shuai Wang is with the Shenzhen Institutes of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China (e-mail: s.wang@siat.ac.cn).
+        }
+        \thanks{
+          Haisheng Tan is with the School of Artificial Intelligence and Data Science, University of Science and Technology of China, Hefei 230027, China (email: hstan@ustc.edu.cn).
         }%
         \thanks{
-          F.C.M. Lau is with the Department of Computing Science, the University of Hong Kong (HKU), Hong Kong (email: fcmlau@cs.hku.hk).
+          Francis C.M. Lau is with the Department of Computer Science, School of Computing and Data Science, The University of Hong Kong, Hong Kong, China (email: fcmlau@cs.hku.hk).
         }%
     }
 
@@ -227,4 +235,5 @@
     \bibliographystyle{IEEEtrans}
     \bibliography{references/related.bib}
 
+    \input{src/100-biography}
 \end{document}

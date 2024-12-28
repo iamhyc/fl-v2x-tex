@@ -30,6 +30,14 @@ In the $t$-th time slot, the location of the $m$-th {\IAV} is denoted as $\vec{d
 \begin{align*}
     \vec{L}_{m} \define \Paren{ \vec{d}_{m,1}, \vec{d}_{m,2}, \dots }.
 \end{align*}
+%<*tag:route>
+\revise{
+    Note that although both the route and the trajectory consist of a sequence of waypoints, they are different. The sequence of waypoints for a route, say $\tjSet_{m}$, represents a path from location $\vec{w}_{m,1}$ to location $\vec{w}_{m,|\tjSet_{m}|}$. There is no velocity information for a route. 
+    On the other hand, the sequence of waypoints for a trajectory represents the locations of a {\IAV} in different time slots. For example, a {\IAV} may stay at the same waypoint in two adjacent time slots due to heavy traffic.
+    Thus, the velocity information can be deduced from the trajectory.
+    Due to the random nature of traffic, the trajectory of a {\IAV} moving along a route is non-deterministic.
+}%
+%</tag:route>
 
 In this paper, we approximate the trajectories of all {\IAVs} $\set{ \vec{L}_{m} | \forall m\in\carSet }$ as time-invariant Markov chains with the transition matrices
 $\set{ \TransD_{m} \in \domR^{|\tjSet_{m}| \times |\tjSet_{m}|} | \forall m\in\carSet }$, where $\vec{D}_{m}$ represents the transition matrix of the $m$-th {\IAV}.
@@ -48,21 +56,19 @@ Due to the heterogeneous computation capabilities of the {\IAVs}, the local trai
 It is assumed that the local training time of the $m$-th {\IAV} is $T_{\text{comp},m}$, and the model consists of $U$ information bits.
 Hence, an uplink queue with $U$ information bits is established at the $m$-th {\IAV} since the $(T_{\text{comp},m}+1)$-th time slot.
 The period from the $1$-st time slot to the time slot that all the {\IAVs} complete their model uploading is referred to as the \emph{scheduling period} in the remaining of this paper.
-Therefore, the length of the actual scheduling period depends on the uplink transmission scheduling policy.
+Therefore, the length of the scheduling period depends on the uplink transmission scheduling policy.
 
 All the {\IAVs} are served via a BS with $Y$ distributed antenna units,
 and the locations of the antenna units are denoted as $\vec{b}_1, \dots, \vec{b}_Y$, respectively.
 Each {\IAV} delivers its local model to the closest antenna unit, such that the transmission energy can be saved.
-The distance between the $m$-th {\IAV} and the receive antenna unit in the $t$-th time slot is denoted as
+The distance between the $m$-th {\IAV} and the receiving antenna unit in the $t$-th time slot is denoted as
 \begin{align*}
     l_{m,t} = \min_{i=1,2,\dots,Y} \|\vec{d}_{m,t} - \vec{b}_i\|_2.
 \end{align*}
 In order to avoid the co-channel interference, the {\IAVs} access the BS in a time-division manner in each time slot. There is at most one {\IAV} in the uplink transmission at any time instance. Let $\gamma_{m,t}$ be the ratio of the $t$-th time slot allocated to the $m$-th {\IAV}, we have
-\begin{align*}
-    \gamma_{m,t} \geq 0~\forall m\in\carSet \text{,~and} \sum_{m\in\carSet} \gamma_{m,t} \leq 1.
-\end{align*}
+$\gamma_{m,t} \geq 0 (\forall m\in\carSet)$, and $\sum_{m\in\carSet} \gamma_{m,t} \leq 1$.
 
-Let $\mu_{m,t}$ be the path-loss of the $m$-th {\IAV}'s uplink channel in the $t$-th time slot, the uplink throughput of the $m$-th {\IAV} in the $t$-th time slot, we have
+Let $\mu_{m,t}$ be the path-loss of the $m$-th {\IAV}'s uplink channel in the $t$-th time slot, we have
 \begin{align*}
     \mu_{m,t} = \kappa \Bracket{ \frac{ \sigma }{ l_{m,t} } }^{\epsilon},
     % \label{eqn:mu}
@@ -78,10 +84,7 @@ Hence, the uplink throughput of the $m$-th {\IAV} in the $t$-th time slot $r_{m,
 \end{align}
 where $h_{m,t}$ is the coefficient of small-scale fading, $N_0$ is the power of Gaussian noise, $B_0$ is the uplink bandwidth, $p_{m,t}$ is the transmission power of the $m$-th {\IAV}, the expectation is taken over the random small-scale fading.
 In the above equation, the ergodic capacity is used since the time slot is significantly longer than the channel coherent time.
-Moreover, the transmission power should satisfy the following peak power constraint:
-\begin{align*}
-    p_{m,t} \leq P_{\max}.
-\end{align*}
+Moreover, the transmission power should satisfy the peak power constraint $p_{m,t} \leq P_{\max}$.
 
 Let $u_{m,t}$ ($\forall, m,t$) be the remaining number of information bits in the uplink queue of the $m$-th {\IAV} in the $t$-th time slot, the queue dynamics are given by
 \begin{align*}

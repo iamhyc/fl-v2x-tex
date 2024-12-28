@@ -1,40 +1,56 @@
 \section{Introduction}
 \label{sec:introduction}
 %NOTE: (1) federated learning for autonomous driving
-Deep learning for autonomous driving \cite{ad-survey} has raised significant communication and computation burdens to wireless edge computing systems. This is because the raw data for model training collected on {\IAVFullnames} ({\IAVs}) is up to terabytes. Fortunately, the vehicular federated learning, e.g., \cite{icra21-invs,feel-wangs}, could suppress the unnecessary cost of data communication by uploading the locally trained models \cite{vfl-survey}. Nevertheless, the model uploading in the federated learning still consumes significant transmission time and energy. In this paper, we would like to investigate the efficient model uploading techniques in a  vehicle-to-infrastructure (V2I) network by exploiting the prediction on {\IAVs}' random trajectories.
+Deep learning for autonomous driving \cite{ad-survey} has raised significant communication and computation burdens to wireless edge computing systems. This is because the raw data for model training collected on {\IAVFullnames} ({\IAVs}) is up to terabytes.
+\revise{
+    Fortunately, vehicular federated learning \cite{icra21-invs} could suppress unnecessary cost of data communication by uploading the locally trained models \cite{vfl-survey,feel-wangs,comst22-balkus,tiv23-chellapandi}.
+}%
+Nevertheless, model uploading in federated learning still consumes significant transmission time and energy.
+In this paper, we would like to investigate the efficient model uploading techniques in a Vehicle-to-Infrastructure (V2I) network by exploiting the prediction on {\IAVs}' random trajectories.
 
+\subsection{Related Works}
 %NOTE: (2) related works for FL on vehicles
-% deterministic optimization for data uploading or offloading
-The communication and computation scheduling for vehicle networks couples tightly with the vehicles' trajectories (the vehicles' locations versus time).
-There have been a number of works considering the joint scheduling of communication and edge computing (or edge learning) in vehicle networks with deterministic trajectories
-\cite{Globecom18-Wang, Access19-Xu, TITS21-Xiao, JSAC23-Pervej, IOTJ22-Lv, TVT22-Hui, ICC23-Bansal},
-where the future locations of vehicles could be planed or known in advance.
-For example in \cite{Globecom18-Wang}, the scenario that multiple vehicles move along one unidirectional road at a constant speed and offload the computation tasks to one base station (BS) was considered, where a heuristic scheme was proposed to suppress the delay of task offloading via vehicle-to-vehicle (V2V) communications.
-The edge computing scenario with multiple BSs and disjoint coverage was then investigated in \cite{Access19-Xu}. A genetic algorithm was proposed to make the task offloading decision, such that a good trade-off between the total turn-around time and the total resource utility could be achieved.
-In \cite{TITS21-Xiao}, the weighted summation of time and energy consumption was minimized in vehicular federated learning, where the velocities of vehicles and the transmission data rate were assumed to be constant. 
-Although most of the related works assumed deterministic trajectory, the actual velocities of the vehicles are random, depending on road map, population distribution, working hours, car-holding rate, driving habits and etc. The above scheduling design based on deterministic optimization could not be directly applied, as scheduling with random trajectory might be stochastic optimization problems.
+\revise{
+    The federated learning on vehicles has been widely studied in the literature, where the communication scheduling is essential \cite{feel-wangs, comst22-balkus, tiv23-chellapandi}.
+    Unlike the works that considered the communication scheduling for the federated learning in quasi-static scenarios \cite{Access19-Xu, iotj22-he, jsac23-du, tmc24-shen, tmc24-xu}, the communication and computation scheduling for vehicular networks is tightly coupled with the vehicles' trajectories.
+    For example, the works \cite{tvt21-yang, tmc21-saputra, tits22-liu, tvt22-lee} studied the client selection strategy of the vehicles to alleviate the communication burden and thus improve the training efficiency, but did not optimize the transmission scheduling.
+
+    % deterministic optimization for data uploading or offloading
+    There have been a number of works that consider the joint optimization of communication and edge learning (or edge computing) in vehicle networks with deterministic trajectories \cite{Globecom18-Wang, TITS21-Xiao, IOTJ22-Lv, JSAC23-Pervej, TVT22-Hui, ICC23-Bansal, tvt21-zhao, tvt22-shinde, tits22-taik, jsac23-zhang,tmc23-zhang}.
+    For example, in \cite{Globecom18-Wang}, the scenario of multiple vehicles moving along a unidirectional road at a constant speed and offloading the computation tasks to a base station (BS) was considered, where a heuristic scheme was proposed to suppress the delay of task offloading via Vehicle-to-Vehicle (V2V) communication.
+    In \cite{TITS21-Xiao}, the weighted sum of time and energy consumption in vehicular federated learning was minimized, where the velocities of vehicles and the transmission data rate were assumed to be constant.
+    Both \cite{jsac23-zhang} and \cite{tmc23-zhang} considered time-varying velocities of vehicles, where the former focused on the downlink broadcasting for the vehicular platoon, and the latter jointly optimized the transmission power and local model accuracy in the worst case.
+}%
 
 % stochastic optimization for offloading
-There have been a few works on the scheduling of data communication or edge computing in vehicle networks with random trajectory
+In fact, the actual velocities of the vehicles are random, depending on the road map, population distribution, working hours, car-holding rate, driving habits and etc. The above scheduling design based on deterministic optimization could not be directly applied, as scheduling with random trajectory is usually a stochastic optimization problem.
+There have been limited works on the scheduling of data communication or edge computing in vehicle networks with random trajectory
 \cite{TVT18-Ni, Access19-Liu, TVT19-Liu, WC16-Salahuddin, TITS16-Wang, FGCS23-Sethi}.
-For example in \cite{TVT18-Ni}, a hybrid vehicle-to-vehicle (V2V) and vehicle-to-infrastructure (V2I) network was considered with random inter-vehicle distance, where a heuristic strategy was proposed to cluster the vehicles and maximize the expected communication capacity.
-In \cite{Access19-Liu}, continuous task offloading from single vehicle to multiple edge servers was optimized via the Q-learning with the average task turn around time as the minimization objective. However, it is difficult to extend the Q-learning method to multi-vehicle scenario, due to the curse of dimensionality.
-In \cite{TVT19-Liu}, the scenario that both fixed and vehicular servers would provide computation service to multiple user equipment was investigated. The Deep Q-Network (DQN) was leveraged to train the offloading and power allocation decisions, such that the average total communication and computation cost of all UEs was minimized. However, the model training might be of significant computational complexity and the performance can hardly be bounded analytically with the method of DQN. Moreover, the models of random traffic in the above works might be too ideal to fit the real applications. Hence, there are still some open issues on the scheduling algorithm design for vehicle networks:
+For example in \cite{TVT18-Ni}, a hybrid Vehicle-to-Vehicle (V2V) and Vehicle-to-Infrastructure (V2I) network was considered with random inter-vehicle distance, where a heuristic strategy was proposed to cluster the vehicles and maximize the expected communication capacity.
+In \cite{Access19-Liu}, continuous task offloading from single vehicle to multiple edge servers was optimized via the Q-learning where the average task turn around time was considered as the minimization objective. However, it is difficult to extend the Q-learning method to multi-vehicle scenario, due to the curse of dimensionality.
+In \cite{TVT19-Liu}, the scenario that both fixed and vehicular servers would provide computation service to multiple user equipment was investigated. The Deep Q-Network (DQN) was leveraged to train the offloading and power allocation decisions, such that the average total communication and computation cost of all UEs was minimized. However, the model training might be of significant computational complexity, and the performance can hardly be bounded analytically with the method of DQN. Moreover, the models of random traffic in the above works might be too ideal to fit the real-world applications.
+Therefore, there are still some open issues in the scheduling algorithm design for vehicle networks:
 \begin{enumerate}
-    \item How to depict the randomness of vehicular trajectory resembling the real-world statistics, instead of assuming it in trivial form like Gaussian distribution?
+    \item How to depict the randomness of vehicular trajectory resembling the real-world statistics, instead of assuming it in a trivial form like Gaussian distribution?
     \item How to efficiently and reliably handle long-term and large-scale online resource allocation for vehicle networks with random traffic?
 \end{enumerate}
-% \begin{itemize}
-%     \item How to obtain the statistics of the vehicles' random trajectories for one particular road network? In practice, the random trajectories of vehicles may depend on road map, population distribution, working hours, car-holding rate, driving habit and etc. The cost of real measurement is significant.
-%     \item Is there any reliable and low-complexity stochastic optimization framework for the transmission scheduling of in-vehicle federated learning? 
-% \end{itemize}
 
-To shed some lights on the above issues, we particularly consider the scenario of in-vehicle federated learning, and propose a optimization framework with high-fidelity traffic simulator, namely {\fwName}, for scheduling of the model uploading. In fact, the scheduling of model uploading for multiple vehicles with random trajectories is a finite-horizon Markov Decision Process (MDP), where the complexity of optimal solution grows exponentially with respect to the vehicle number \cite{mdp-cui,mdp-zhou}. The {\fwName} aims to exploit the statistical knowledge on the trajectories of vehicles and provide a low-complexity scheduling solution with a good performance, where the contributions are summarized below.
+\subsection{Our Contributions}
+
+%<*tag:contribution>
+To shed some light on the above issues, we particularly consider the scenario of in-vehicle federated learning, and propose an optimization framework with a high-fidelity traffic simulator, namely {\fwName}, for scheduling of the model uploading. 
+\revise{
+    Specifically, the uplink transmission time and power of multiple vehicles in a sequence of time slots are jointly scheduled to complete their model uploading.
+}%
+Due to the random trajectories of the vehicles, the scheduling design is a finite-horizon Markov Decision Process (MDP), where the complexity of the optimal solution grows exponentially with respect to the vehicle number \cite{mdp-cui,mdp-zhou}. The {\fwName} aims to exploit the statistical knowledge on the trajectories of vehicles and provide a low-complexity scheduling solution with good performance, where the contributions are summarized below.
 \begin{itemize}
-    \item We develop the {\fwName} simulator to obtain high-fidelity trajectory datasets of {\IAVs} in customizable traffic scenarios, such that the random trajectories of vehicles can be modelled as Markov chains via statistical learning and predicted in online scheduling. 
-    \item We propose a novel two-time-scale solution algorithm, namely {\fwName} optimizer, to find a sub-optimal policy with low complexity. Moreover, a non-trivial performance bound is provided. The simulation results show that the {\fwName} optimizer outperforms various baselines, and achieves good balance between computational complexity and performance.
+    \item We develop the {\fwName} simulator to obtain high-fidelity trajectory datasets of {\IAVs} in customizable traffic scenarios, so that the random trajectories of vehicles can be modeled as Markov chains via statistical learning and predicted in online scheduling.
+    \revise{
+    \item We propose a novel two-time scale solution algorithm, namely {\fwName} optimizer, to search for a suboptimal policy with low complexity. Note that the uplink scheduling of multiple vehicles is coupled due to the transmission time allocation. In the proposed solution, the complicated time allocation for the remaining model uploading is updated in a large time scale (every $N$ time slots). Given the time allocation, the power allocation of a DCV in each time slot (small time scale) can be calculated locally.
+    \item A non-trivial performance bound is derived for the above two-time scale solution algorithm. The simulation results show that the {\fwName} optimizer outperforms various baselines, and achieves good balance between computational complexity and performance.
+    }
 \end{itemize}
-
+%</tag:contribution>
 The remainder of this paper is organized as follows.
 In Section \ref{sec:model}, the traffic model of {\IAVs}, as well as the models of uplink queuing and data transmission, is described.
 In Section \ref{sec:formulation}, the communication scheduling problem is formulated as a finite-horizon MDP, where the structure and challenge of optimal solution is discussed.
@@ -49,6 +65,5 @@ bold uppercase letters (e.g., $\mat{A}$) are used to denote matrices,
 and calligraphic letters (e.g., $\mathcal{A}$) are used to denote sets.
 $(\mat{A})_{i,j}$ denotes the $(i,j)$-th entry of the matrix $\mat{A}$.
 $[a_{j}]_{j}$ with $j\in \mathcal{J}$ denotes the column vector whose entries' indexes take values from sets $\mathcal{J}$ in ascending order; $[a_{i,j}]_{i,j}$ with $i\in \mathcal{I}$ and  $j\in \mathcal{J}$ denotes the matrix.
-% $[a_{i,j}]_{i\in \mathcal{I}; j\in \mathcal{J}}$ denotes a matrix whose row and column indexes take values from the sequences $\mathcal{I}$ and $\mathcal{J}$ respectively.
 $\|{\vec{a}}\|_2$ denote the L2-norm of vector $\vec{a}$.
 $\indicator[\cdot]$ is the indicator function which is equal to $1$ when the inner statement is true and $0$ otherwise.

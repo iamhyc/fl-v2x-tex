@@ -16,16 +16,14 @@ We first define the system state, scheduling action, policy, and the cost functi
         \Stat_t &\define \Brace{ \Stat_{1,t}, \dots, \Stat_{M,t} }.
     \end{align}
 
-    The scheduling action in the $t$-th time slot $\vec{A}_{t}$ consists of the allocation of transmission time and throughput%
-    \footnote{
-        Given the transmission time $\gamma_{m,t}$ and transmission power $p_{m,t}$,
-        the throughput of the $m$-th {\IAV} in the $t$-th time slot $r_{m,t}$ can be determined according to equation \eqref{eqn:vu}.
-        We choose the transmission time and throughput as the action for the elaboration convenience.
-    }
-    of all {\IAVs},
-    \begin{align}
-        \vec{A}_{t} \define \Brace{ \gamma_{m,t}, r_{m,t} | \forall m\in\carSet }.
-    \end{align}
+    %<*tag:action>
+    \revise{
+        The scheduling action in the $t$-th time slot $\vec{A}_{t}$ consists of the allocation of transmission time and power of all {\IAVs}. Note that given the transmission time $\gamma_{m,t}$ and power $p_{m,t}$, the throughput of the $m$-th {\IAV} in the $t$-th time slot $r_{m,t}$ can be determined according to equation \eqref{eqn:vu}. Equivalently, the following definition of scheduling action is adopted for the elaboration convenience: 
+        \begin{align}
+            \vec{A}_{t} \define \Brace{ \gamma_{m,t}, r_{m,t} | \forall m\in\carSet }.
+        \end{align}
+    }%
+    %</tag:action>
     A centralized scheduling policy in the $t$-th time slot $\Policy_{t}$ is a mapping from the global system state $\Stat_{t}$ to the scheduling action, thus,
     \begin{align}
         \Policy_{t}\paren{\Stat_t} &= \Paren{ \Policy^{\Gamma}_{t}(\Stat_t), \Policy^{R}_{t}(\Stat_t) },
@@ -43,7 +41,6 @@ Given the action of the $t$-th time slot, the state transition probability from 
 \end{align}
 where $\Pr\bracket{ \vec{d}_{m,t+1} | \vec{d}_{m,t} }$ denotes the transition probability of the $m$-th {\IAV}'s trajectory from the waypoint $\vec{d}_{m,t}  \in \tjSet_{m}$ to $\vec{d}_{m,t+1} \in \tjSet_{m}$.
 
-% It can be observed that different policies leads to different amount of uplink throughput, transmission energy consumption of each time slot, and finally different model uploading time and total energy consumption.
 The policy design aims to minimize a weighted sum of the average model uploading time of all {\IAVs} and the average transmission energy consumption.
 To achieve this goal, we define the system cost of the $t$-th time slot ($\forall t$) as follows:
 \begin{align}
@@ -85,7 +82,7 @@ In order to solve the above finite-horizon MDP, we first introduce the following
     }, t=1,\dots,T,
     \label{eqn:p1_blm}
 \end{align}
-where the value function of the optimal policies in the $t$-th time slot
+where the value function of the optimal policies in the $t$-th time slot is given by
 \begin{align}
     V_{t}(\Stat_{t}) \define \min_{\Policy_{t},\dots,\Policy_{\T}}& \mathbb{E}_{\Stat_{t},\dots,\Stat_{\T}}
     \Bracket{
@@ -96,7 +93,7 @@ where the value function of the optimal policies in the $t$-th time slot
 
 As a remark notice that in finite-horizon MDP, the value functions are usually heterogeneous for different time slots. The optimal time and throughput allocation policies can be obtained by solving the RHS of equation \eqref{eqn:p1_blm}.
 However, the problem {\bf P1} is difficult to solve.
-On one hand, the transition probability of {\IAVs}' trajectories in (\ref{eqn:trans_prob}) for a particular road network is hard to measure in advance, unless extensive real experiments can be conducted on the road network beforehand.
+On one hand, the transition probability of {\IAVs}' trajectories in equation (\ref{eqn:trans_prob}) for a particular road network can hardly be obtained, unless extensive real experiments can be conducted on the road network beforehand.
 On the other hand, the optimal value functions depend on the global system state, which grows exponentially with respect to the number of {\IAVs}.
 Therefore, it is infeasible to calculate the value functions for each global system state before the online scheduling.
 
@@ -114,12 +111,12 @@ Then the {\fwName} optimizer is proposed in Section \ref{sec:new_framework} to a
 \section{{\fwName} Simulator for Transition Probability Training}
 \label{sec:framework}
 
-The waypoint transition probabilities $\Pr\bracket{\vec{d}_{m,t+1}|\vec{d}_{m,t}}$ ($\forall m\in\carSet$) in \eqref{eqn:trans_prob} depend on the routes, the road topology, the microscopic traffic behaviors and etc, which are usually difficult to measure in advance.
-A mismatching of the trajectories' statistics would lead to a biased estimation of the value function defined in \eqref{eqn:p1_val}, and degrade the performance of the optimized scheduling policy. To our best knowledge, there is currently no analytical model for the vehicles' trajectory prediction.
+The waypoint transition probabilities $\Pr\bracket{\vec{d}_{m,t+1}|\vec{d}_{m,t}}$ ($\forall m\in\carSet$) in equation \eqref{eqn:trans_prob} depend on routes, road topology, microscopic traffic behavior, etc., which are usually difficult to measure in advance.
+A mismatching of the trajectories' statistics would lead to a biased estimation of the value function defined in equation \eqref{eqn:p1_val}, and degrade the performance of the optimized scheduling policy. To our best knowledge, there is currently no analytical model for the vehicles' trajectory prediction.
 Therefore, we develop the {\fwName} simulator to simulate the trajectories of {\IAVs} for arbitrary traffic scenario, so that the waypoint transition probabilities $\Pr\bracket{\vec{d}_{m,t+1}|\vec{d}_{m,t}}$ can be trained in an offline manner.
 
 The {\fwName} simulator integrates two well-known autonomous driving simulators, namely SUMO \cite{SUMO} and CARLA \cite{CARLA}.
-CARLA is the open-source simulator based on Unreal Engine \cite{unrealengine}, which provides customized road topologies and vehicle types following the OpenDRIVE specification \cite{OpenDRIVE}.
+CARLA is the open-source simulator based on Unreal Engine \cite{unrealengine}, which provides customized road topology and vehicle types following the OpenDRIVE specification \cite{OpenDRIVE}.
 On the other hand, SUMO provides the traffic management of vehicles with well-defined microscopic traffic flow model.
 Based on them, the procedure to train the transition probabilities is given as follows.
 
@@ -155,7 +152,7 @@ As a remark note that the trajectory dataset generation and waypoint transition 
     \hrulefill
 \end{figure*}
 
-\section{{\fwName} Optimizer for Decentralized Scheduling}
+\section{\revise{Decentralized Scheduling Framework of {\fwName} Optimizer}}
 \label{sec:new_framework}
 
 The joint policy optimization for the {\IAVs} in problem {\bf P1} suffers from the {\it curse of dimensionality} \cite{mdp-huang,mdp-lv}.
@@ -163,11 +160,11 @@ This is because the transmission time and throughput allocation of each {\IAV} i
 
 In order to reduce the computational complexity and meanwhile maintain the performance gain of dynamic programming, a dynamic decoupling method is proposed for the {\fwName} optimizer in this section. The framework is illustrated in Fig. \ref{fig:optimizer_framework}, where every $N$ time slots is organized as a {\it super slot} and the online optimization consists of the following two time scales.
 \begin{itemize}
-    \item Super slot scale: the transmission time allocation of all {\IAVs} for the remaining time slots is periodically optimized at the beginning of each super slot. Such optimization will be approximated as a deterministic optimization problem based on the global system state at the beginning of each super slot.
+    \item Super-slot scale: the transmission time allocation of all {\IAVs} for the remaining time slots is periodically optimized at the beginning of each super slot. Such optimization will be approximated as a deterministic optimization problem based on the global system state at the beginning of each super slot.
     \item Slot scale: based on transmission time allocation, the optimization of throughput allocation policy of each {\IAV} for all the remaining time slots can be decoupled as a local finite-horizon MDP with tractable state space. The approximate expressions of local value functions will be derived, such that each {\IAV} can evaluate them and determine the throughput allocation in each slot without the effort of offline value iteration.
 \end{itemize}
 
-\subsection{Super Slot Scale Optimization}
+\subsection{Super-Slot Scale Optimization}
 Without loss of generality, we consider the scheduling since the $k$-th super slot (from the $(kN+1)$-th time slot), where $k=1,2,\dots$. The policy optimization of problem {\bf P1} for all the remaining time slots given the global system state $\Stat_{kN+1}$ reduces to the following sub-problem:
 \begin{align}
     \textbf{P1$(k)$:}
@@ -185,7 +182,7 @@ Without loss of generality, we consider the scheduling since the $k$-th super sl
 where the last constraint \eqref{eqn:p1p_cons_last} is to ensure all the data in the uplink queues of {\IAVs} should be delivered.
 
 
-In the optimization of super slot scale, the average trajectories are used as the representatives to optimize the time slot allocation, such that the dynamic programming of problem \textbf{P1$(k)$} can be simplified to a deterministic optimization problem.
+In the optimization of super-slot scale, the average trajectories are used as the representatives to optimize the time slot allocation, such that the dynamic programming of problem \textbf{P1$(k)$} can be simplified to a deterministic optimization problem.
 Note that
 \begin{align}
     \sum_{\tau=kN+1}^{\T} g_{\tau}\Paren{
@@ -208,7 +205,7 @@ of the $m$-th {\IAV} ($\forall m\in\carSet$) since the $k$-th super slot. Approx
         & = \arg\min_{ T, \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} } F_k\Paren{ T, \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} }\nonumber
             \\
         &\text{s.t.~} \text{ \eqref{eqn:p1_cons_second}, \eqref{eqn:p1_cons_last}, \eqref{eqn:p1_cons_first},}
-        \\
+        \nonumber\\
     & \sum_{ \tau=kN+1 }^{ T } r_{m,\tau} \geq {u}_{m,kN+1} \forall m\in\carSet, \label{eqn:constraint_T}
     \end{align}
 where
@@ -224,7 +221,7 @@ are the aggregation matrices of time and throughput allocations of all the remai
 with $\xi_{m,t} = \frac{N_0}{\kappa \sigma^\epsilon} 2^{-\mathbb{E}_{h_{m,t}}\bracket{\log_2{|h_{m,t}|^2}}}$ is used.
 
 
-The  algorithm for the super slot scale optimization in problem \textbf{P2$(k)$} is discussed in Section \ref{sec:kernel-policy}.
+The  algorithm for the super-slot scale optimization in problem \textbf{P2$(k)$} is discussed in Section \ref{sec:kernel-policy}.
 Its solution is denoted as
 $$\mat{\Gamma}^{(k,*)}=[\gamma^{(k,*)}_{m,\tau+kN}]_{1 \leq m \leq M, 1 \leq \tau \leq T^{(k,*)}-kN}$$
 and

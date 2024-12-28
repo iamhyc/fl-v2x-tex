@@ -1,10 +1,11 @@
-\section{Global Super-Slot-Scale Optimization}
+\section{\revise{Centralized Global Optimization in Super-Slot Scale: Solution of Problem P2}}
 \label{sec:kernel-policy}
 The problem P2$(k)$ could be of a large scale when the number of remaining time slots is large. In this section, a large-scale optimization method is proposed.
 Note that the time and throughput allocation ($\mat{\Gamma}^{(k,T)}, \mat{R}^{(k,T)}$) and scheduling period length $T$ are continuous and discrete, respectively, they can be optimized respectively. First, the optimization of P2$(k)$ given scheduling period length $T$ can be written as follows:
 \begin{align}
     \textbf{P2$'(k,T)$:~}
     \min_{ \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} } &F_k\paren{ T, \mat{R}^{(k,T)}, \mat{\Gamma}^{(k,T)} }
+    \nonumber
     \\\nonumber
     \text{s.t.~} & \text{ \eqref{eqn:p1_cons_second}, \eqref{eqn:p1_cons_last}, \eqref{eqn:p1_cons_first}, \eqref{eqn:constraint_T} }.
 \end{align}
@@ -103,7 +104,6 @@ According to the proposition 2 of \cite{fast-projection}, the solution to the ab
     where
     $$m' = \max_{m} \set{m: {\sum_{j=1}^{m} \bar{\gamma}^{(j)}_{\tau} - 1 } <{m} \bar{\gamma}^{(m)}_{\tau}},$$ 
     $$\tau' = \max_{\tau} \set{\tau: {\sum_{j=1}^{\tau} u_{m,t} - \bar{r}^{(j)}_{m}} <{\tau} \bar{r}^{(\tau)}_{m}}.$$
-    % repeat the above projection procedures unless $\widebar{\mat{\Gamma}}^{(k)}$ and $\widebar{\mat{R}}^{(k)}$ are feasible.
 \end{lemma}
 
 Denote ${\mat{\Gamma}^{(k,T,*)}}$ and ${\mat{R}^{(k,T,*)}}$ as the optimized time and throughput allocations of problem \textbf{P2$'(k,T)$} after convergence, the optimization of scheduling period duration can be written as follows.
@@ -116,7 +116,6 @@ Note that the variable $T$ is an integer between $1$ and $\T$, a  bisection sear
     \caption{Bisection Search Algorithm for problem \textbf{P2$''(k)$}}\label{alg_bnb}
     \DontPrintSemicolon
     \KwOut{ $T^{(k,*)}$ }
-    % \KwOut{$\{ { \gamma^{*}_{m,\tau} }, { r^{*}_{m,\tau} } | \forall m\in\carSet, \tau=kN+1,\dots,{T}^{*} \}$}
     $\tau_{l} \gets kN+1$, $\tau_{r} \gets \T$\;
      $w_{r} \gets \min F_{k}( \tau_{r}, \mat{R}_{r}, \mat{\Gamma}_{r} )$ by solving \textbf{P2$'( k,\tau_{r} )$}\;
     \While{ $\tau_{r} - \tau_{l} > 1$ }
@@ -134,7 +133,7 @@ Note that the variable $T$ is an integer between $1$ and $\T$, a  bisection sear
     \Return{ $T^{(k,*)} \gets \tau_{l}$ }\;
 \end{algorithm}
 
-\section{Local Slot-Scale Optimization}
+\section{\revise{Distributive Local Optimization in Slot Scale: Solution of Problem P3} }
 \label{sec:local-policy}
 
 In this section, the low-complexity algorithm solving the problem \textbf{P3$(k,m)$} without the offline value iteration is elaborated. Note that the local system state of the $m$-th {\IAV} consists of $\Stat_{m,t} =  ( u_{m,t}, \vec{d}_{m,t} )$, the Bellman's equations of problem \textbf{P3$(k,m)$} are given below.
@@ -251,7 +250,8 @@ In the above expressions, $\vec{e}_{\tau}$ denotes the vector whose $\tau$-th di
 With the local value function approximation in the previous part, the local throughput allocation of the $m$-th {\IAV} in the $t_i$-th slot can be determined by solving problem \textbf{P3$'(k,m,t_i)$}. We first introduce the following conclusion.
 \begin{lemma}
     \label{lemma:local_approx_solution}
-    With the approximation of local value function in \eqref{eqn:local-value-app}, the optimal solution of problem \textbf{P3$'(k,m,t_i)$} is within the set $\{f_{m,t_i}(\hat{\tau}_m),f_{m,t_i}(\breve{\tau}_m) \}$, where
+    With the approximation of local value function in equation \eqref{eqn:local-value-app}, the optimal solution of problem \textbf{P3$'(k,m,t_i)$} is within the set $\{f_{m,t_i}(\hat{\tau}_m),f_{m,t_i}(\breve{\tau}_m) \}$, where
+    {\small
     \begin{align}
         f_{m,t_i}(\tau_m) \define
         \min\Paren{
@@ -269,6 +269,7 @@ With the local value function approximation in the previous part, the local thro
             \Delta{r}^{\max}_{m,t_i}
         },
     \end{align}
+    }%
     where $p_{m,t_i}( r^{(k,i-1)}_{m,t_i} + \Delta{r}^{\max}_{m,t_i} ) = P_{\max}$.
 \end{lemma}
 \begin{proof}
@@ -287,7 +288,7 @@ where
 \end{align}
 
 \subsection{Proposed Policy and Performance Bound}
-As a result of global super-slot-scale optimization and local slot-scale optimization, the proposed policy, denoted as $\Baseline$, is summarized below.
+As a result of global super-slot scale optimization and local-slot scale optimization, the proposed policy, denoted as $\Baseline$, is summarized below.
 \begin{definition}[Proposed Policy $\Baseline$]
     \label{def:baseline}
     In the $t_i$-th time slot where $t_i=kN+i$ ($\forall k,i$),
@@ -330,7 +331,6 @@ We have the following conclusion on the performance bound.
 \begin{theorem}[Analytical Performance Bound]
     \label{theorem:performance_analysis}
     In the $t_i$-th time slot where $t_i=kN+i$ ($\forall k,i$),
-    % for sufficiently large $P_{\max}$,
     we have
     \begin{align}
         &V^{\Baseline}_{t_i}(\Stat_{t_i})
@@ -340,7 +340,6 @@ We have the following conclusion on the performance bound.
     \end{align}
     where the RHS represents the average cost with
     time allocation $\{\gamma^{(k,*)}_{m,\tau}\}$ obtained at the start of the $k$-th super slot, and throughput allocation $\{r^{(k,i-1)}_{m,\tau}\}$ obtained in the $(t_i-1)$-th time slot.
-    % time and throughput allocation $\{\gamma^{(k,*)}_{m,\tau}\}$ and $\{r^{(k,i-1)}_{m,\tau}\}$, respectively.
 \end{theorem}
 \begin{proof}
     Please refer to Appendix \ref{append_3}.
